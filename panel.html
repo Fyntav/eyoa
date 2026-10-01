@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EYOA</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="eye eye-sm" aria-hidden="true"></span>
+        <div class="brand-text">
+          <strong>EYOA</strong>
+          <span id="tagline">Assistente de navegação</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="newChat" class="icon-btn" title="Nova conversa" aria-label="Nova conversa">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button id="openSettings" class="icon-btn" title="Configurações" aria-label="Configurações">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="chat" class="chat">
+      <div id="empty" class="empty">
+        <span class="eye eye-lg" aria-hidden="true"></span>
+        <h1>Como posso ajudar?</h1>
+        <p>Descreva a tarefa. O assistente abre páginas, clica, preenche e lê o conteúdo para você.</p>
+        <div class="suggestions">
+          <button class="suggestion" data-prompt="Resuma o conteúdo desta página em tópicos.">Resuma esta página</button>
+        </div>
+      </div>
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <!-- olho que volta devagar quando sobra espaço na conversa -->
+      <div id="idleEye" class="idle-eye" hidden><span class="eye eye-lg" aria-hidden="true"></span></div>
+    </main>
+
+    <footer class="composer">
+      <div class="controls">
+        <div class="picker">
+          <div class="pill ai-pill">
+            <button id="providerBtn" class="ai-btn" type="button" title="IA em uso. Clique para trocar." aria-haspopup="true" aria-expanded="false">
+              <span id="providerIcon" class="ai-icon"></span>
+            </button>
+            <button id="modelBtn" class="plus-btn" type="button" title="Escolher o modelo" aria-haspopup="true" aria-expanded="false" aria-label="Escolher o modelo">+</button>
+          </div>
+          <div id="providerMenu" class="provider-menu" role="menu" hidden></div>
+          <div id="modelMenu" class="model-menu" role="menu" hidden></div>
+        </div>
+        <div class="effort pill" role="group" aria-label="Esforço da IA">
+          <span id="effortTitle" class="pill-label">Esforço</span>
+          <div id="effort" class="effort-options"></div>
+          <span id="effortName" class="effort-name"></span>
+        </div>
+      </div>
+      <div id="attachments" class="attachments"></div>
+      <div class="composer-box">
+        <textarea id="input" rows="1" placeholder="Descreva a tarefa…" aria-label="Mensagem"></textarea>
+        <div class="composer-row">
+          <button id="attach" class="icon-btn" title="Anexar arquivos" aria-label="Anexar arquivos">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1 12.2 20.3a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+          </button>
+          <input id="file" type="file" multiple hidden
+            accept="image/*,application/pdf,audio/*,video/*,.txt,.md,.csv,.json,.html,.xml,.log">
+          <span id="tabInfo" class="tab-info" title=""></span>
+          <button id="send" class="send-btn" title="Enviar" aria-label="Enviar">
+            <svg class="ic-send" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <svg class="ic-stop" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <section id="settings" class="settings" hidden>
+      <header class="topbar">
+        <strong>Configurações</strong>
+        <button id="closeSettings" class="icon-btn" title="Fechar" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="settings-body">
+        <div class="field">
+          <span>Chaves de API</span>
+          <small>Preencha a chave das IAs que deseja usar. As chaves ficam guardadas somente neste navegador.</small>
+          <div id="providerFields" class="provider-fields"></div>
+        </div>
+
+        <div class="field">
+          <span>Autorização das ações</span>
+          <label class="radio"><input type="radio" name="confirmMode" value="ask"> Perguntar antes de clicar, digitar ou abrir páginas</label>
+          <label class="radio"><input type="radio" name="confirmMode" value="auto"> Executar sem perguntar</label>
+        </div>
+
+        <div class="settings-actions">
+          <button id="saveSettings" class="primary-btn" type="button">Salvar e verificar</button>
+          <p id="settingsStatus" class="settings-status" role="status"></p>
+        </div>
+
+        <div class="notice">
+          <strong>Cuidados</strong>
+          <ul>
+            <li>O conteúdo das páginas lidas e dos anexos é enviado à IA em uso para análise.</li>
+            <li>O assistente não digita senhas nem dados de cartão.</li>
+            <li>A conversa não é gravada: ao fechar o painel, ela é apagada.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="dropzone" class="dropzone" hidden>Solte os arquivos para anexar</div>
+  </div>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
