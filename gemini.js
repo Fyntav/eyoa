@@ -1,4 +1,4 @@
-// Adaptador para o Gemini (Google), pela API generateContent.
+// Adapter for Gemini (Google), via the generateContent API.
 import { requestJson } from './api.js';
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -20,9 +20,9 @@ export async function listModels(cfg, signal) {
     .filter((m) => m.id.startsWith('gemini') && !NOT_CHAT.test(m.id));
 }
 
-// Usa somente os modelos "lite", que têm o maior limite de uso no plano gratuito;
-// os estáveis vêm antes dos de prévia, do mais novo para o mais antigo.
-// Se a chave não oferecer nenhum "lite", usa os demais "flash" e, por último, o restante.
+// Uses only the "lite" models, which have the highest rate limit on the free plan;
+// stable ones come before previews, newest to oldest.
+// If the key offers no "lite", uses the other "flash" models and, last, the rest.
 export function buildModelChain(models) {
   const ids = models.map((m) => m.id);
   const order = (list) =>
@@ -39,8 +39,8 @@ function functionResponse(name, id, response, extra) {
   return { functionResponse: { ...fr, ...extra } };
 }
 
-// imageMode define como a captura de tela volta ao modelo: dentro do resultado da
-// ferramenta ('nested'), ao final da mensagem ('sibling') ou sem imagem ('none').
+// imageMode defines how the screenshot goes back to the model: inside the tool
+// result ('nested'), at the end of the message ('sibling') or without image ('none').
 function toContents(contents, imageMode) {
   return contents.map((c) => {
     const parts = [];
@@ -53,12 +53,12 @@ function toContents(contents, imageMode) {
           const inlineData = { mimeType: 'image/jpeg', data: p.image };
           if (imageMode === 'nested') parts.push(functionResponse(name, id, response, { parts: [{ inlineData }] }));
           else if (imageMode === 'sibling') {
-            parts.push(functionResponse(name, id, { resultado: 'A captura de tela está na imagem ao final desta mensagem.' }));
+            parts.push(functionResponse(name, id, { result: 'The screenshot is the image at the end of this message.' }));
             images.push({ inlineData });
-          } else parts.push(functionResponse(name, id, { error: 'Este modelo não aceitou a imagem. Use read_page ou get_page_text.' }));
+          } else parts.push(functionResponse(name, id, { error: 'This model did not accept the image. Use read_page or get_page_text.' }));
         }
       } else if (p.inlineData) parts.push({ inlineData: p.inlineData });
-      else parts.push(p); // texto e chamadas de função voltam intactos (preserva as assinaturas de raciocínio)
+      else parts.push(p); // text and function calls go back intact (preserves the thought signatures)
     }
     return { role: c.role, parts: [...parts, ...images] };
   });
@@ -84,6 +84,6 @@ export async function generate({ cfg, model, contents, systemInstruction, tools,
   return {
     parts,
     malformed: !parts.length && cand && cand.finishReason === 'MALFORMED_FUNCTION_CALL',
-    blockReason: !parts.length ? (data.promptFeedback && data.promptFeedback.blockReason) || (cand && cand.finishReason) || 'sem resposta' : null,
+    blockReason: !parts.length ? (data.promptFeedback && data.promptFeedback.blockReason) || (cand && cand.finishReason) || 'no response' : null,
   };
 }

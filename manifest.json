@@ -3,7 +3,7 @@
   "name": "EYOA",
   "short_name": "EYOA",
   "version": "1.0.0",
-  "description": "Painel lateral que usa a IA de sua escolha (Gemini, Claude, ChatGPT e outras) para executar tarefas no navegador: abrir páginas, clicar, preencher e ler conteúdo.",
+  "description": "A side-panel browser agent that uses the AI of your choice (Gemini, Claude, ChatGPT and more) to get things done: open pages, click, fill in forms and read content.",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/icon16.png",
@@ -12,7 +12,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Abrir o EYOA",
+    "default_title": "Open EYOA",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"

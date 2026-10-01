@@ -1,4 +1,4 @@
-// Base comum das chamadas às IAs: erro padronizado, novas tentativas e mensagens em português.
+// Common base for the AI calls: standardized error, retries and user-facing error messages.
 
 export class ApiError extends Error {
   constructor(message, status, detail) {
@@ -19,19 +19,19 @@ export const sleep = (ms, signal) =>
 function friendlyMessage(who, status, apiMessage, model) {
   const msg = apiMessage || '';
   if (status === 401 || status === 403 || (status === 400 && /api[ _-]?key/i.test(msg))) {
-    return `A chave de API de ${who} não é válida ou não tem permissão. Confira a chave nas configurações. Detalhe: ${msg || 'erro ' + status}`;
+    return `The ${who} API key is invalid or lacks permission. Check the key in Settings. Detail: ${msg || 'error ' + status}`;
   }
-  if (status === 404) return `O modelo "${model}" não está disponível em ${who}.`;
-  if (status === 429) return `Limite de uso da chave de ${who} atingido. Detalhe: ${msg}`;
-  if (status === 402) return `A conta de ${who} está sem saldo ou sem faturamento ativo. Detalhe: ${msg}`;
-  if (status === 503 || status === 529) return `O modelo "${model}" de ${who} está sobrecarregado no momento. Detalhe: ${msg || 'erro ' + status}`;
-  if (status >= 500) return `O serviço de ${who} respondeu com erro interno (código ${status}). Detalhe: ${msg || 'sem detalhe'}`;
-  return `${who} recusou a solicitação: ${msg || 'erro ' + status}`;
+  if (status === 404) return `The model "${model}" is not available on ${who}.`;
+  if (status === 429) return `${who} key usage limit reached. Detail: ${msg}`;
+  if (status === 402) return `The ${who} account has no credit or billing enabled. Detail: ${msg}`;
+  if (status === 503 || status === 529) return `The ${who} model "${model}" is overloaded right now. Detail: ${msg || 'error ' + status}`;
+  if (status >= 500) return `${who} returned an internal error (code ${status}). Detail: ${msg || 'no detail'}`;
+  return `${who} rejected the request: ${msg || 'error ' + status}`;
 }
 
-// Faz a chamada e devolve o JSON. Erros de rede e erros internos são repetidos; limite de
-// uso (429), sobrecarga (503/529) e modelo inexistente (404) voltam para quem chamou,
-// que decide trocar de modelo.
+// Makes the call and returns the JSON. Network errors and internal errors are retried; rate
+// limits (429), overload (503/529) and nonexistent model (404) go back to the caller,
+// which decides whether to switch model.
 export async function requestJson(url, { method = 'GET', headers = {}, body, signal, who, model } = {}) {
   let lastError;
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -45,7 +45,7 @@ export async function requestJson(url, { method = 'GET', headers = {}, body, sig
       });
     } catch (e) {
       if (e.name === 'AbortError') throw e;
-      lastError = new ApiError(`Sem conexão com ${who}. Verifique a internet.`, 0, String(e));
+      lastError = new ApiError(`No connection to ${who}. Check your internet.`, 0, String(e));
       await sleep(1000 * (attempt + 1), signal);
       continue;
     }
@@ -71,7 +71,7 @@ export async function requestJson(url, { method = 'GET', headers = {}, body, sig
   throw lastError;
 }
 
-// Converte o esquema de parâmetros (tipos em maiúsculas, padrão do Gemini) para JSON Schema comum.
+// Converts the parameter schema (uppercase types, Gemini's convention) to standard JSON Schema.
 export function toJsonSchema(schema) {
   if (!schema) return { type: 'object', properties: {} };
   const out = { ...schema };

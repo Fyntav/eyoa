@@ -1,10 +1,10 @@
-// Adaptador para o Claude (Anthropic), pela Messages API.
+// Adapter for Claude (Anthropic), via the Messages API.
 import { requestJson, toJsonSchema } from './api.js';
 
 const BASE = 'https://api.anthropic.com/v1';
 const WHO = 'Claude';
 const PREFERRED = ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-4-5'];
-// Modelos que aceitam a troca automática de modelo em caso de recusa pelos filtros de segurança.
+// Models that accept automatic model switching when refused by the safety filters.
 const FALLBACK_MODELS = /^claude-(opus-5|fable-5-1|sonnet-5-5)/;
 const noFallback = new Set();
 
@@ -12,7 +12,7 @@ function headers(apiKey, beta) {
   const h = {
     'x-api-key': apiKey,
     'anthropic-version': '2023-06-01',
-    // A chamada parte da própria extensão, com a chave informada pelo usuário.
+    // The call originates from the extension itself, with the key entered by the user.
     'anthropic-dangerous-direct-browser-access': 'true',
   };
   if (beta) h['anthropic-beta'] = beta;
@@ -53,12 +53,12 @@ function userBlocks(parts) {
       const { mimeType, data } = p.inlineData;
       if (mimeType.startsWith('image/')) others.push({ type: 'image', source: { type: 'base64', media_type: mimeType, data } });
       else if (mimeType === 'application/pdf') others.push({ type: 'document', source: { type: 'base64', media_type: mimeType, data } });
-      else others.push({ type: 'text', text: `(O anexo "${p.name || mimeType}" não pode ser lido por esta IA.)` });
+      else others.push({ type: 'text', text: `(The attachment "${p.name || mimeType}" cannot be read by this AI.)` });
     } else if (typeof p.text === 'string' && p.text.trim()) {
       others.push({ type: 'text', text: p.text });
     }
   }
-  // Os resultados de ferramenta precisam vir antes de qualquer outro conteúdo da mensagem.
+  // Tool results must come before any other content in the message.
   return [...results, ...others];
 }
 
@@ -66,7 +66,7 @@ function toMessages(contents) {
   const messages = [];
   for (const c of contents) {
     if (c.role === 'model') {
-      // A resposta original do Claude volta intacta (inclui os blocos de raciocínio).
+      // Claude's original response goes back intact (includes the thinking blocks).
       let content = c.nativeProvider === 'anthropic' && c.native ? c.native : null;
       if (!content) {
         content = [];
@@ -103,7 +103,7 @@ export async function generate({ cfg, model, contents, systemInstruction, tools,
   try {
     data = await requestJson(`${BASE}/messages`, { method: 'POST', headers: headers(cfg.key, beta), body, signal, who: WHO, model });
   } catch (e) {
-    // Se a conta não aceitar o recurso de troca automática, repete sem ele.
+    // If the account does not accept the automatic switching feature, retries without it.
     if (beta && e.status === 400 && /fallback|beta/i.test(e.detail || '')) {
       noFallback.add(model);
       return generate({ cfg, model, contents, systemInstruction, tools, effort, signal });
@@ -112,12 +112,12 @@ export async function generate({ cfg, model, contents, systemInstruction, tools,
   }
   const blocks = data.content || [];
   if (data.stop_reason === 'refusal') {
-    return { parts: [], blockReason: 'o modelo recusou o pedido por segurança' };
+    return { parts: [], blockReason: 'the model refused the request for safety reasons' };
   }
   const parts = [];
   for (const b of blocks) {
     if (b.type === 'text' && b.text) parts.push({ text: b.text });
     else if (b.type === 'tool_use') parts.push({ functionCall: { name: b.name, args: b.input || {}, id: b.id } });
   }
-  return { parts, native: blocks, blockReason: data.stop_reason === 'max_tokens' && !parts.length ? 'resposta cortada pelo limite de tamanho' : null };
+  return { parts, native: blocks, blockReason: data.stop_reason === 'max_tokens' && !parts.length ? 'response cut by the length limit' : null };
 }

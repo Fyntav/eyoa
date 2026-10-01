@@ -1,5 +1,5 @@
-// Adaptador para IAs que seguem o formato "Chat Completions" da OpenAI
-// (ChatGPT, DeepSeek, Grok, Groq, Mistral, OpenRouter e serviços compatíveis).
+// Adapter for AIs that follow OpenAI's "Chat Completions" format
+// (ChatGPT, DeepSeek, Grok, Groq, Mistral, OpenRouter and compatible services).
 import { requestJson, toJsonSchema } from './api.js';
 
 const NOT_CHAT = /(audio|realtime|image|tts|transcri|search|embed|instruct|moderation|codex|dall-e|whisper|guard|ocr|rerank|babbage|davinci)/i;
@@ -43,17 +43,17 @@ function toMessages(contents, systemInstruction, imageMode) {
     const content = [];
     for (const p of c.parts) {
       if (p.toolResult) {
-        // Cada resultado é uma mensagem própria, logo após a resposta que pediu a ferramenta.
+        // Each result is its own message, right after the response that requested the tool.
         messages.push({ role: 'tool', tool_call_id: p.toolResult.id, content: JSON.stringify(p.toolResult.response) });
         if (p.image && imageMode !== 'none') {
-          content.push({ type: 'text', text: 'Captura de tela solicitada:' });
+          content.push({ type: 'text', text: 'Requested screenshot:' });
           content.push({ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${p.image}` } });
         }
       } else if (p.inlineData) {
         const { mimeType, data } = p.inlineData;
         if (mimeType.startsWith('image/')) content.push({ type: 'image_url', image_url: { url: `data:${mimeType};base64,${data}` } });
         else if (mimeType === 'application/pdf') content.push({ type: 'file', file: { filename: p.name || 'anexo.pdf', file_data: `data:${mimeType};base64,${data}` } });
-        else content.push({ type: 'text', text: `(O anexo "${p.name || mimeType}" não pode ser lido por esta IA.)` });
+        else content.push({ type: 'text', text: `(The attachment "${p.name || mimeType}" cannot be read by this AI.)` });
       } else if (typeof p.text === 'string' && p.text.trim()) {
         content.push({ type: 'text', text: p.text });
       }
@@ -75,7 +75,7 @@ export async function generate({ provider, cfg, model, contents, systemInstructi
       function: { name: t.name, description: t.description, parameters: toJsonSchema(t.parameters) },
     })),
   };
-  // O ajuste de esforço só é enviado a quem reconhece o parâmetro.
+  // The effort setting is only sent to those that recognize the parameter.
   if (effort && provider.id === 'openai') body.reasoning_effort = effort;
   const data = await requestJson(`${base(provider, cfg)}/chat/completions`, {
     method: 'POST',
@@ -91,11 +91,11 @@ export async function generate({ provider, cfg, model, contents, systemInstructi
   if (typeof msg.content === 'string' && msg.content) parts.push({ text: msg.content });
   (msg.tool_calls || []).forEach((call, i) => {
     let args = {};
-    try { args = JSON.parse(call.function.arguments || '{}'); } catch { /* argumentos inválidos: segue vazio */ }
+    try { args = JSON.parse(call.function.arguments || '{}'); } catch { /* invalid arguments: continues empty */ }
     parts.push({ functionCall: { name: call.function.name, args, id: call.id || `call_${Date.now()}_${i}` } });
   });
   return {
     parts,
-    blockReason: !parts.length ? (choice.finish_reason === 'content_filter' ? 'conteúdo bloqueado pelo filtro da IA' : choice.finish_reason || null) : null,
+    blockReason: !parts.length ? (choice.finish_reason === 'content_filter' ? 'content blocked by the AI filter' : choice.finish_reason || null) : null,
   };
 }

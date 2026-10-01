@@ -1,10 +1,10 @@
-# Origem dos logotipos das IAs
+# AI logo sources
 
-Os arquivos desta pasta são marcas registradas dos respectivos donos e são usados apenas para identificar cada serviço.
+The files in this folder are trademarks of their respective owners and are used only to identify each service.
 
-| Arquivo | Coleção | Licença da coleção |
+| File | Collection | Collection license |
 | --- | --- | --- |
-| gemini.svg, anthropic.svg, openai.svg, deepseek.svg, mistral.svg, openrouter.svg | [Simple Icons](https://simpleicons.org) | CC0 1.0 |
+| gemini.svg, anthropic.svg (Claude), openai.svg, deepseek.svg, mistral.svg, openrouter.svg | [Simple Icons](https://simpleicons.org) | CC0 1.0 |
 | xai.svg (Grok) | [LobeHub Icons](https://github.com/lobehub/lobe-icons) | MIT |
 
 ## LobeHub Icons — MIT License

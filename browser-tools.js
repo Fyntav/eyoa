@@ -1,73 +1,73 @@
-// Ferramentas que o modelo usa para operar o navegador.
+// Tools the model uses to operate the browser.
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const obj = (properties, required = []) => ({ type: 'OBJECT', properties, required });
-const INDEX = { type: 'INTEGER', description: 'Número do elemento na leitura mais recente da página.' };
+const INDEX = { type: 'INTEGER', description: 'Element number from the latest page reading.' };
 
 export const TOOL_DECLARATIONS = [
   {
     name: 'read_page',
     description:
-      'Lê a página da aba em uso: endereço, título, texto visível e a lista numerada de elementos com os quais é possível interagir. Os números mudam a cada leitura.',
+      'Reads the current tab: URL, title, visible text and the numbered list of interactive elements. Numbers change on every reading.',
   },
   {
     name: 'get_page_text',
-    description: 'Retorna o texto completo da página (até 30 mil caracteres). Use para ler artigos e documentos longos.',
+    description: 'Returns the full page text (up to 30,000 characters). Use it to read long articles and documents.',
   },
-  { name: 'click', description: 'Clica no elemento indicado.', parameters: obj({ index: INDEX }, ['index']) },
+  { name: 'click', description: 'Clicks the given element.', parameters: obj({ index: INDEX }, ['index']) },
   {
     name: 'type_text',
     description:
-      'Digita um texto em um campo. Por padrão substitui o conteúdo atual do campo. Quebras de linha no texto são preservadas: em listas, separe os itens com quebra de linha.',
+      'Types text into a field. Replaces the current content by default. Line breaks are preserved: in lists, separate items with line breaks.',
     parameters: obj(
       {
         index: INDEX,
-        text: { type: 'STRING', description: 'Texto a digitar.' },
-        clear: { type: 'BOOLEAN', description: 'Se falso, acrescenta ao texto já existente. Padrão: verdadeiro.' },
-        press_enter: { type: 'BOOLEAN', description: 'Se verdadeiro, pressiona Enter ao final (ex.: enviar uma busca).' },
+        text: { type: 'STRING', description: 'Text to type.' },
+        clear: { type: 'BOOLEAN', description: 'If false, appends to the existing text. Default: true.' },
+        press_enter: { type: 'BOOLEAN', description: 'If true, presses Enter at the end (e.g. to submit a search).' },
       },
       ['index', 'text']
     ),
   },
   {
     name: 'select_option',
-    description: 'Escolhe uma opção em uma lista suspensa (select).',
-    parameters: obj({ index: INDEX, option: { type: 'STRING', description: 'Texto ou valor da opção.' } }, ['index', 'option']),
+    description: 'Chooses an option in a dropdown (select).',
+    parameters: obj({ index: INDEX, option: { type: 'STRING', description: 'Option text or value.' } }, ['index', 'option']),
   },
   {
     name: 'press_key',
-    description: 'Pressiona uma tecla no elemento em foco. Teclas: Enter, Escape, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, PageDown, PageUp, Home, End, Backspace.',
-    parameters: obj({ key: { type: 'STRING', description: 'Nome da tecla.' } }, ['key']),
+    description: 'Presses a key on the focused element. Keys: Enter, Escape, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, PageDown, PageUp, Home, End, Backspace.',
+    parameters: obj({ key: { type: 'STRING', description: 'Key name.' } }, ['key']),
   },
   {
     name: 'scroll',
-    description: 'Rola a página.',
+    description: 'Scrolls the page.',
     parameters: obj(
       {
-        direction: { type: 'STRING', enum: ['down', 'up', 'top', 'bottom'], description: 'Direção.' },
-        pages: { type: 'NUMBER', description: 'Quantidade de telas a rolar (padrão 1).' },
+        direction: { type: 'STRING', enum: ['down', 'up', 'top', 'bottom'], description: 'Direction.' },
+        pages: { type: 'NUMBER', description: 'Number of screens to scroll (default 1).' },
       },
       ['direction']
     ),
   },
   {
     name: 'navigate',
-    description: 'Abre um endereço (http ou https) na aba em uso.',
-    parameters: obj({ url: { type: 'STRING', description: 'Endereço completo.' } }, ['url']),
+    description: 'Opens a URL (http or https) in the current tab.',
+    parameters: obj({ url: { type: 'STRING', description: 'Full URL.' } }, ['url']),
   },
-  { name: 'go_back', description: 'Volta para a página anterior da aba em uso.' },
+  { name: 'go_back', description: 'Goes back to the previous page in the current tab.' },
   {
     name: 'screenshot',
-    description: 'Captura a imagem da parte visível da página. Use quando a leitura em texto não for suficiente (gráficos, imagens, layout).',
+    description: 'Captures the visible part of the page as an image. Use it when the text reading is not enough (charts, images, layout).',
   },
   {
     name: 'wait',
-    description: 'Aguarda alguns segundos (no máximo 10) para a página terminar de carregar.',
-    parameters: obj({ seconds: { type: 'NUMBER', description: 'Segundos a aguardar.' } }, ['seconds']),
+    description: 'Waits a few seconds (10 at most) for the page to finish loading.',
+    parameters: obj({ seconds: { type: 'NUMBER', description: 'Seconds to wait.' } }, ['seconds']),
   },
 ];
 
-// Ações que alteram algo e, por isso, pedem autorização do usuário.
+// Actions that change something and therefore ask the user's permission.
 export const NEEDS_CONFIRMATION = new Set([
   'click',
   'type_text',
@@ -82,30 +82,30 @@ const short = (s, n = 60) => {
   return s.length > n ? s.slice(0, n - 1) + '…' : s;
 };
 
-// Texto exibido ao usuário para cada ação.
+// Text shown to the user for each action.
 export function describeAction(name, args = {}, labels = {}) {
   const el = () => {
     const label = labels[args.index];
-    return label ? `"${short(label, 50)}"` : `o elemento ${args.index}`;
+    return label ? `"${short(label, 50)}"` : `element ${args.index}`;
   };
   switch (name) {
-    case 'read_page': return 'Ler a página';
-    case 'get_page_text': return 'Ler o texto completo da página';
-    case 'click': return `Clicar em ${el()}`;
-    case 'type_text': return `Digitar "${short(args.text, 70)}" em ${el()}${args.press_enter ? ' e pressionar Enter' : ''}`;
-    case 'select_option': return `Selecionar "${short(args.option, 40)}" em ${el()}`;
-    case 'press_key': return `Pressionar a tecla ${short(args.key, 20)}`;
-    case 'scroll': return { down: 'Rolar a página para baixo', up: 'Rolar a página para cima', top: 'Ir ao topo da página', bottom: 'Ir ao fim da página' }[args.direction] || 'Rolar a página';
-    case 'navigate': return `Abrir ${short(args.url, 80)}`;
-    case 'go_back': return 'Voltar à página anterior';
-    case 'screenshot': return 'Capturar a imagem da página';
-    case 'wait': return 'Aguardar o carregamento';
+    case 'read_page': return 'Read the page';
+    case 'get_page_text': return 'Read the full page text';
+    case 'click': return `Click ${el()}`;
+    case 'type_text': return `Type "${short(args.text, 70)}" into ${el()}${args.press_enter ? ' and press Enter' : ''}`;
+    case 'select_option': return `Select "${short(args.option, 40)}" in ${el()}`;
+    case 'press_key': return `Press the ${short(args.key, 20)} key`;
+    case 'scroll': return { down: 'Scroll down', up: 'Scroll up', top: 'Go to the top of the page', bottom: 'Go to the bottom of the page' }[args.direction] || 'Scroll the page';
+    case 'navigate': return `Open ${short(args.url, 80)}`;
+    case 'go_back': return 'Go back to the previous page';
+    case 'screenshot': return 'Take a screenshot of the page';
+    case 'wait': return 'Wait for the page to load';
     default: return name;
   }
 }
 
 /* ------------------------------------------------------------------ */
-/* Funções injetadas na página. Precisam ser autossuficientes.         */
+/* Functions injected into the page. They must be self-contained.     */
 /* ------------------------------------------------------------------ */
 
 function pageSnapshot(maxElements, maxText) {
@@ -157,35 +157,35 @@ function pageSnapshot(maxElements, maxText) {
     let line = `[${n}] <${tag}${type ? ' type=' + type : ''}${role ? ' role=' + role : ''}>`;
     if (label) line += ` "${label}"`;
     if (tag === 'input' || tag === 'textarea') {
-      if (type === 'checkbox' || type === 'radio') line += el.checked ? ' (marcado)' : ' (desmarcado)';
-      else if (type === 'password') line += ' (campo de senha)';
-      else if (el.value) line += ` valor="${clean(el.value, 60)}"`;
+      if (type === 'checkbox' || type === 'radio') line += el.checked ? ' (checked)' : ' (unchecked)';
+      else if (type === 'password') line += ' (password field)';
+      else if (el.value) line += ` value="${clean(el.value, 60)}"`;
       const ph = el.getAttribute('placeholder');
-      if (ph && ph !== label) line += ` dica="${clean(ph, 40)}"`;
+      if (ph && ph !== label) line += ` placeholder="${clean(ph, 40)}"`;
     } else if (tag === 'select') {
       const opts = [...el.options].slice(0, 15).map((o) => (o.selected ? '*' : '') + clean(o.text, 30));
-      line += ` opções: ${opts.join(' | ')}${el.options.length > 15 ? ' | …' : ''}`;
+      line += ` options: ${opts.join(' | ')}${el.options.length > 15 ? ' | …' : ''}`;
     } else if (tag === 'a') {
       const href = el.getAttribute('href') || '';
       if (href && !href.startsWith('javascript:') && href !== '#') line += ` -> ${clean(el.href, 90)}`;
     }
-    if (el.getAttribute('aria-expanded')) line += ` expandido=${el.getAttribute('aria-expanded')}`;
-    if (rect.bottom < 0 || rect.top > vh) line += ' (fora da tela)';
+    if (el.getAttribute('aria-expanded')) line += ` expanded=${el.getAttribute('aria-expanded')}`;
+    if (rect.bottom < 0 || rect.top > vh) line += ' (off screen)';
     lines.push(line);
   }
-  if (omitted) lines.push(`… mais ${omitted} elementos não listados. Role a página ou use get_page_text.`);
+  if (omitted) lines.push(`… ${omitted} more elements not listed. Scroll the page or use get_page_text.`);
 
   let text = (document.body ? document.body.innerText : '').replace(/\n{3,}/g, '\n\n').trim();
   const total = text.length;
-  if (total > maxText) text = text.slice(0, maxText) + `\n… (texto cortado: ${total} caracteres no total; use get_page_text ou role a página)`;
+  if (total > maxText) text = text.slice(0, maxText) + `\n… (text truncated: ${total} characters in total; use get_page_text or scroll the page)`;
 
   const maxScroll = Math.max(0, document.documentElement.scrollHeight - vh);
   return {
     url: location.href,
     title: document.title,
-    rolagem: maxScroll ? `${Math.round((window.scrollY / maxScroll) * 100)}% da página` : 'página sem rolagem',
-    elementos: lines.join('\n') || '(nenhum elemento interativo encontrado)',
-    texto: text,
+    scroll: maxScroll ? `${Math.round((window.scrollY / maxScroll) * 100)}% of the page` : 'page does not scroll',
+    elements: lines.join('\n') || '(no interactive element found)',
+    text,
     labels,
   };
 }
@@ -195,13 +195,13 @@ function pageText(maxChars) {
   return {
     url: location.href,
     title: document.title,
-    texto: text.length > maxChars ? text.slice(0, maxChars) + `\n… (cortado: ${text.length} caracteres no total)` : text,
+    text: text.length > maxChars ? text.slice(0, maxChars) + `\n… (truncated: ${text.length} characters in total)` : text,
   };
 }
 
 function pageClick(index) {
   const el = document.querySelector(`[data-agx-id="${index}"]`);
-  if (!el) return { ok: false, error: 'Elemento não encontrado. A página mudou; consulte a nova leitura.' };
+  if (!el) return { ok: false, error: 'Element not found. The page changed; check the new reading.' };
   el.scrollIntoView({ block: 'center', inline: 'center' });
   const r = el.getBoundingClientRect();
   const opts = { bubbles: true, cancelable: true, composed: true, view: window, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, button: 0 };
@@ -216,14 +216,14 @@ function pageClick(index) {
 
 function pageType(index, text, clear, pressEnter) {
   const el = document.querySelector(`[data-agx-id="${index}"]`);
-  if (!el) return { ok: false, error: 'Elemento não encontrado. A página mudou; consulte a nova leitura.' };
+  if (!el) return { ok: false, error: 'Element not found. The page changed; check the new reading.' };
   const tag = el.tagName.toLowerCase();
   const type = (el.getAttribute('type') || '').toLowerCase();
   if (tag === 'input' && type === 'password') {
-    return { ok: false, error: 'Campo de senha. Por segurança, o assistente não digita senhas: peça ao usuário que digite.' };
+    return { ok: false, error: 'Password field. For safety the assistant does not type passwords: ask the user to type it.' };
   }
   if (tag === 'input' && type === 'file') {
-    return { ok: false, error: 'Campo de envio de arquivo. Peça ao usuário que selecione o arquivo.' };
+    return { ok: false, error: 'File upload field. Ask the user to choose the file.' };
   }
   el.scrollIntoView({ block: 'center' });
   el.focus({ preventScroll: true });
@@ -236,8 +236,8 @@ function pageType(index, text, clear, pressEnter) {
   } else if (el.isContentEditable) {
     if (clear) document.execCommand('selectAll', false);
     if (text.includes('\n')) {
-      // Texto com várias linhas: editores de conversa (WhatsApp, Gmail) só preservam as
-      // quebras quando o texto chega como "colar". Se o editor não tratar, insere linha a linha.
+      // Multi-line text: chat editors (WhatsApp, Gmail) only preserve the line
+      // breaks when the text arrives as a "paste". If the editor does not handle it, inserts line by line.
       const dt = new DataTransfer();
       dt.setData('text/plain', text);
       const handled = !el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
@@ -251,7 +251,7 @@ function pageType(index, text, clear, pressEnter) {
       document.execCommand('insertText', false, text);
     }
   } else {
-    return { ok: false, error: 'Este elemento não aceita digitação.' };
+    return { ok: false, error: 'This element does not accept typing.' };
   }
   if (pressEnter) {
     const k = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true, composed: true };
@@ -268,20 +268,20 @@ function pageType(index, text, clear, pressEnter) {
 
 function pageSelect(index, option) {
   const el = document.querySelector(`[data-agx-id="${index}"]`);
-  if (!el) return { ok: false, error: 'Elemento não encontrado. A página mudou; consulte a nova leitura.' };
+  if (!el) return { ok: false, error: 'Element not found. The page changed; check the new reading.' };
   if (el.tagName.toLowerCase() !== 'select') {
-    return { ok: false, error: 'Este elemento não é uma lista suspensa comum. Clique nele e depois clique na opção desejada.' };
+    return { ok: false, error: 'This element is not a regular dropdown. Click it, then click the desired option.' };
   }
   const wanted = String(option).trim().toLowerCase();
   const opts = [...el.options];
   const found =
     opts.find((o) => o.value.toLowerCase() === wanted || o.text.trim().toLowerCase() === wanted) ||
     opts.find((o) => o.text.toLowerCase().includes(wanted));
-  if (!found) return { ok: false, error: 'Opção não encontrada. Opções: ' + opts.map((o) => o.text.trim()).slice(0, 30).join(' | ') };
+  if (!found) return { ok: false, error: 'Option not found. Options: ' + opts.map((o) => o.text.trim()).slice(0, 30).join(' | ') };
   Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(el, found.value);
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
-  return { ok: true, selecionado: found.text.trim() };
+  return { ok: true, selected: found.text.trim() };
 }
 
 function pageScroll(direction, pages) {
@@ -292,7 +292,7 @@ function pageScroll(direction, pages) {
   else window.scrollBy(0, direction === 'up' ? -amount : amount);
   if (window.scrollY !== before) return { ok: true };
 
-  // A janela não rolou: tenta a maior área rolável interna (comum em sistemas web).
+  // The window did not scroll: tries the largest inner scrollable area (common in web apps).
   let best = null;
   let bestArea = 0;
   const minArea = (window.innerWidth * window.innerHeight) / 8;
@@ -303,12 +303,12 @@ function pageScroll(direction, pages) {
     if (oy !== 'auto' && oy !== 'scroll') continue;
     best = el; bestArea = area;
   }
-  if (!best) return { ok: true, aviso: 'A página já está no limite da rolagem.' };
+  if (!best) return { ok: true, note: 'The page is already at the scroll limit.' };
   const b = best.scrollTop;
   if (direction === 'top') best.scrollTop = 0;
   else if (direction === 'bottom') best.scrollTop = best.scrollHeight;
   else best.scrollTop += direction === 'up' ? -amount : amount;
-  return best.scrollTop === b ? { ok: true, aviso: 'A página já está no limite da rolagem.' } : { ok: true };
+  return best.scrollTop === b ? { ok: true, note: 'The page is already at the scroll limit.' } : { ok: true };
 }
 
 function pageKey(key) {
@@ -328,7 +328,7 @@ function pageKey(key) {
   return { ok: true };
 }
 
-// Escurece os cantos da página enquanto o assistente trabalha nela.
+// Darkens the page corners while the assistant works on it.
 function pageGlow(mode) {
   const ID = 'agx-glow';
   let el = document.getElementById(ID);
@@ -356,9 +356,9 @@ function pageGlow(mode) {
     pointerEvents: 'none',
     margin: '0',
     opacity: '0',
-    // Escurecimento nos cantos da página (vinheta), sem brilho nas bordas.
+    // Darkening at the page corners (vignette), with no glow on the edges.
     background: 'radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, .45) 76%, rgba(0, 0, 0, .85) 100%)',
-    willChange: 'opacity', // camada própria: não repinta a página
+    willChange: 'opacity', // own layer: does not repaint the page
   });
   document.documentElement.appendChild(el);
   el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, fill: 'forwards' });
@@ -383,7 +383,7 @@ async function downscaleJpeg(dataUrl, maxWidth) {
   return blobToBase64(await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.72 }));
 }
 
-// O assistente trabalha somente em uma aba: aquela em que o painel foi aberto.
+// The assistant works in a single tab only: the one where the panel was opened.
 export class BrowserTools {
   constructor(tabId = null) {
     this.tabId = tabId;
@@ -391,7 +391,7 @@ export class BrowserTools {
     this.glowing = false;
   }
 
-  // Usado apenas quando o painel não recebeu a aba na abertura.
+  // Used only when the panel did not receive the tab on opening.
   async bindToActiveTab() {
     if (this.tabId != null) return;
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -401,7 +401,7 @@ export class BrowserTools {
 
   async tab() {
     const t = this.tabId != null ? await chrome.tabs.get(this.tabId).catch(() => null) : null;
-    if (!t) throw new Error('A aba em que o assistente foi aberto não está mais disponível.');
+    if (!t) throw new Error('The tab the assistant was opened in is no longer available.');
     return t;
   }
 
@@ -409,12 +409,12 @@ export class BrowserTools {
     const tab = await this.tab();
     try {
       const [res] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func, args });
-      return res ? res.result : { ok: false, error: 'A página não respondeu.' };
+      return res ? res.result : { ok: false, error: 'The page did not respond.' };
     } catch (e) {
       return {
         ok: false,
         error:
-          'Não é possível operar nesta página (páginas internas do Chrome, a Chrome Web Store e arquivos PDF abertos no navegador são protegidos). Use navigate para abrir um site. Detalhe: ' +
+          'This page cannot be operated (internal Chrome pages, the Chrome Web Store and PDFs opened in the browser are protected). Use navigate to open a website. Detail: ' +
           (e.message || e),
       };
     }
@@ -426,7 +426,7 @@ export class BrowserTools {
     await this.inPage(pageGlow, [on ? 'on' : 'off']).catch(() => {});
   }
 
-  // Aguarda a página assentar depois de uma ação (no máximo 5 segundos de carregamento).
+  // Waits for the page to settle after an action (at most 5 seconds of loading).
   async settle(ms = 300) {
     await sleep(ms);
     const start = Date.now();
@@ -448,7 +448,7 @@ export class BrowserTools {
     return res;
   }
 
-  // Executa uma ação e devolve o resultado junto com a nova leitura da página.
+  // Runs an action and returns the result together with the new page reading.
   async act(func, args) {
     const tab = await this.tab();
     let opened = null;
@@ -463,7 +463,7 @@ export class BrowserTools {
       chrome.tabs.onCreated.removeListener(onCreated);
     }
     if (opened) {
-      // O link abriria outra aba: o assistente fica restrito à sua, então abre o endereço nela.
+      // The link would open another tab: the assistant is restricted to its own, so it opens the URL there.
       await sleep(300);
       const nt = await chrome.tabs.get(opened.id).catch(() => null);
       const url = nt && (nt.pendingUrl || nt.url);
@@ -471,10 +471,10 @@ export class BrowserTools {
       if (url && /^https?:\/\//i.test(url)) {
         await chrome.tabs.update(tab.id, { url });
         await this.settle(600);
-        result = { ...result, aviso: 'O link abriria uma nova aba; a página foi aberta nesta mesma aba.' };
+        result = { ...result, note: 'The link would open a new tab; the page was opened in this same tab instead.' };
       }
     }
-    return { ...result, pagina: await this.snapshot() };
+    return { ...result, page: await this.snapshot() };
   }
 
   async run(name, args = {}) {
@@ -495,32 +495,32 @@ export class BrowserTools {
         const res = await this.inPage(pageScroll, [String(args.direction || 'down'), Number(args.pages) || 1]);
         if (res && res.ok === false) return res;
         await sleep(300);
-        return { ...res, pagina: await this.snapshot() };
+        return { ...res, page: await this.snapshot() };
       }
       case 'navigate': {
         let url = String(args.url || '').trim();
         if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) url = 'https://' + url;
-        if (!/^https?:\/\//i.test(url)) return { ok: false, error: 'Somente endereços http ou https são permitidos.' };
+        if (!/^https?:\/\//i.test(url)) return { ok: false, error: 'Only http or https URLs are allowed.' };
         const tab = await this.tab();
         await chrome.tabs.update(tab.id, { url });
         await this.settle(600);
-        return { ok: true, pagina: await this.snapshot() };
+        return { ok: true, page: await this.snapshot() };
       }
       case 'go_back': {
         const tab = await this.tab();
         try {
           await chrome.tabs.goBack(tab.id);
         } catch {
-          return { ok: false, error: 'Não há página anterior nesta aba.' };
+          return { ok: false, error: 'There is no previous page in this tab.' };
         }
         await this.settle(600);
-        return { ok: true, pagina: await this.snapshot() };
+        return { ok: true, page: await this.snapshot() };
       }
       case 'screenshot': {
         const tab = await this.tab();
-        // A captura só alcança a aba visível; nunca captura outra aba do usuário.
+        // The capture only reaches the visible tab; it never captures another of the user's tabs.
         if (!tab.active) {
-          return { ok: false, error: 'A aba do assistente não está visível no momento, por isso a imagem não pode ser capturada. Use read_page.' };
+          return { ok: false, error: 'The assistant tab is not visible right now, so the screenshot cannot be taken. Use read_page.' };
         }
         try {
           await this.inPage(pageGlow, ['hide']);
@@ -528,11 +528,11 @@ export class BrowserTools {
           const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 80 });
           const still = await chrome.tabs.get(tab.id).catch(() => null);
           if (!still || !still.active) {
-            return { ok: false, error: 'O usuário trocou de aba durante a captura; a imagem foi descartada. Use read_page.' };
+            return { ok: false, error: 'The user switched tabs during the capture; the image was discarded. Use read_page.' };
           }
           return { __image: await downscaleJpeg(dataUrl, 1280) };
         } catch (e) {
-          return { ok: false, error: 'Não foi possível capturar a imagem desta página. Detalhe: ' + (e.message || e) };
+          return { ok: false, error: 'Could not capture this page. Detail: ' + (e.message || e) };
         } finally {
           await this.inPage(pageGlow, ['show']).catch(() => {});
         }
@@ -541,7 +541,7 @@ export class BrowserTools {
         await sleep(Math.min(10, Math.max(0.2, Number(args.seconds) || 1)) * 1000);
         return { ok: true };
       default:
-        return { ok: false, error: 'Ferramenta desconhecida: ' + name };
+        return { ok: false, error: 'Unknown tool: ' + name };
     }
   }
 }

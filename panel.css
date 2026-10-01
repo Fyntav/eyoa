@@ -1,5 +1,5 @@
-/* Tema único: fundo preto absoluto e texto branco, com traços góticos discretos
-   (títulos em serifa, cantos retos e filetes finos). */
+/* Single theme: pure black background and white text, with discreet gothic touches
+   (serif headings, square corners and thin rules). */
 :root {
   --bg: #000000;
   --surface-2: #0e0e0e;
@@ -9,7 +9,7 @@
   --text: #ffffff;
   --muted: #a8a8a8;
   --accent-hover: #d6d6d6;
-  --serif: var(--sans); /* fonte padrão do sistema, a pedido do Luan */
+  --serif: var(--sans); /* system default font, at Luan's request */
   --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   --radius: 2px;
   color-scheme: dark;
@@ -36,10 +36,10 @@ button { cursor: pointer; }
   flex-direction: column;
   height: 100vh;
   min-width: 300px;
-  overflow: hidden; /* o filete torto do cabeçalho sai um pouco da tela e não deve criar rolagem */
+  overflow: hidden; /* the header's slanted rule goes slightly off screen and must not create scrolling */
 }
 
-/* ---------- Topo ---------- */
+/* ---------- Top bar ---------- */
 .topbar {
   position: relative;
   display: flex;
@@ -50,7 +50,7 @@ button { cursor: pointer; }
   background: var(--bg);
   z-index: 2;
 }
-/* o filete do cabeçalho é um pouco torto, na diagonal */
+/* the header rule is slightly slanted, on a diagonal */
 .topbar::after {
   content: "";
   position: absolute;
@@ -88,7 +88,7 @@ button { cursor: pointer; }
   text-overflow: ellipsis;
 }
 .topbar-actions { display: flex; gap: 2px; flex: none; }
-/* os botões do cabeçalho (inclusive o X das configurações) ficam um pouco abaixo da borda */
+/* the header buttons (including the settings X) sit slightly below the edge */
 .topbar .icon-btn { margin-top: 12px; }
 
 .icon-btn {
@@ -103,7 +103,7 @@ button { cursor: pointer; }
   transition: color .15s;
 }
 .icon-btn svg { position: relative; z-index: 1; width: 15px; height: 15px; }
-/* ao passar o mouse: um triângulo branco, um pouco torto, por trás do ícone preto */
+/* on hover: a white, slightly slanted triangle behind the black icon */
 .icon-btn::before {
   content: "";
   position: absolute;
@@ -124,7 +124,7 @@ button { cursor: pointer; }
 .icon-btn:nth-child(2n):hover::before { transform: rotate(11deg) scale(1); }
 :focus-visible { outline: 1px solid #ffffff; outline-offset: 2px; }
 
-/* ---------- Conversa ---------- */
+/* ---------- Chat ---------- */
 .chat { flex: 1; overflow-y: auto; padding: 18px 12px 8px; }
 
 .empty { text-align: center; padding: 30px 10px 10px; }
@@ -152,7 +152,7 @@ button { cursor: pointer; }
   font-size: 14px;
   transition: border-color .15s, background .15s, transform .15s;
 }
-/* marcador: um triângulo branco pequeno e torto, como os demais detalhes */
+/* bullet: a small slanted white triangle, like the other details */
 .suggestion::before {
   content: "";
   flex: none;
@@ -247,7 +247,7 @@ button { cursor: pointer; }
   margin-bottom: 2px;
 }
 
-/* ---------- Etapas ---------- */
+/* ---------- Steps ---------- */
 .steps {
   display: flex;
   flex-direction: column;
@@ -279,7 +279,7 @@ button { cursor: pointer; }
 .thinking i:nth-child(3) { animation-delay: .3s; margin-right: 4px; }
 @keyframes pulse { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
 
-/* ---------- Pedido de autorização ---------- */
+/* ---------- Permission request ---------- */
 .permission {
   padding: 12px;
   border: 1px solid #ffffff;
@@ -308,7 +308,7 @@ button { cursor: pointer; }
 .permission button.allow:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 .permission button:not(.allow):hover { border-color: #ffffff; }
 
-/* ---------- Campo de mensagem ---------- */
+/* ---------- Message field ---------- */
 .composer { padding: 6px 12px 10px; }
 .attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .attachments:empty { display: none; }
@@ -338,7 +338,7 @@ button { cursor: pointer; }
   background: var(--raised);
   border: 1px solid var(--border-strong);
   border-radius: 14px;
-  transform: rotate(1.2deg); /* torta de propósito, no sentido oposto ao filete do cabeçalho */
+  transform: rotate(1.2deg); /* slanted on purpose, in the opposite direction to the header rule */
   transform-origin: center;
   padding: 9px 8px 7px 12px;
   transition: border-color .15s;
@@ -368,7 +368,7 @@ button { cursor: pointer; }
 }
 .send-btn svg { width: 15px; height: 15px; }
 .send-btn svg { position: relative; z-index: 1; }
-/* triângulo branco, um pouco torto, por trás da seta preta */
+/* white, slightly slanted triangle behind the black arrow */
 .send-btn::before {
   content: "";
   position: absolute;
@@ -388,7 +388,7 @@ button { cursor: pointer; }
 body.busy .send-btn .ic-send { display: none; }
 body.busy .send-btn .ic-stop { display: block; }
 
-/* controles acima do chat, alinhados à esquerda e retos */
+/* controls above the chat, left-aligned and straight */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -434,7 +434,7 @@ body.busy .send-btn .ic-stop { display: block; }
 .effort { gap: 10px; }
 .effort-name { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .effort[data-off="true"] { opacity: .45; }
-/* três bolinhas, da menor para a maior: Baixo, Médio e Alto */
+/* three dots, smallest to largest: Low, Medium and High */
 .effort-options { display: flex; align-items: center; gap: 12px; }
 .effort-options button {
   --size: 10px;
@@ -460,7 +460,7 @@ body.busy .send-btn .ic-stop { display: block; }
 .effort-options button:not(:disabled):hover::before { transform: scale(1.12); }
 .effort-options button[aria-pressed="true"]::before { background: #ffffff; }
 
-/* ---------- Configurações ---------- */
+/* ---------- Settings ---------- */
 .settings { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--bg); }
 .settings[hidden] { display: none; }
 .settings-body { padding: 20px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
@@ -480,7 +480,7 @@ body.busy .send-btn .ic-stop { display: block; }
   transition: border-color .15s;
 }
 .field input:focus { border-color: #ffffff; }
-/* lista de IAs nas configurações: uma linha por IA, que abre para mostrar os campos */
+/* AI list in the settings: one row per AI, which expands to show the fields */
 .provider-fields { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .provider-row { border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); overflow: hidden; }
 .provider-row.configured { border-color: #4a4a4a; }
@@ -532,7 +532,7 @@ body.busy .send-btn .ic-stop { display: block; }
   font-size: 12px;
 }
 .provider-show:hover { color: var(--text); border-color: #ffffff; }
-/* opções de autorização como cartões; o escolhido ganha contorno branco */
+/* permission options as cards; the chosen one gets a white outline */
 .radio {
   display: flex;
   gap: 10px;
@@ -580,7 +580,7 @@ body.busy .send-btn .ic-stop { display: block; }
 }
 .notice ul { margin: 6px 0 0; padding-left: 18px; }
 
-/* ---------- Arrastar arquivos ---------- */
+/* ---------- Drag and drop files ---------- */
 .dropzone {
   position: absolute; inset: 8px; z-index: 10;
   display: grid; place-items: center;
@@ -599,12 +599,12 @@ body.busy .send-btn .ic-stop { display: block; }
   * { animation: none !important; transition: none !important; }
 }
 
-/* ---------- O olho: pisca de tempos em tempos e segue o mouse ---------- */
+/* ---------- The eye: blinks from time to time and follows the mouse ---------- */
 .eye { display: inline-block; line-height: 0; }
 .eye-sm { width: 28px; height: 28px; }
 .eye-lg { width: 84px; height: 84px; }
 .eye svg { width: 100%; height: 100%; overflow: visible; }
-/* a piscada fecha só a parte branca, no eixo inclinado do olho; o traço de baixo fica parado */
+/* the blink closes only the white part, along the eye's tilted axis; the stroke below stays still */
 .eye .lids { transform-box: fill-box; transform-origin: center; animation: eye-blink 25s ease-in-out infinite; }
 .eye-lg .lids { animation-duration: 31s; animation-delay: 4s; }
 .eye .pupil { transition: transform .12s ease-out; will-change: transform; }
@@ -615,15 +615,15 @@ body.busy .send-btn .ic-stop { display: block; }
   98.9%, 99.5% { transform: scaleY(0); }
 }
 
-/* em painéis largos a inclinação do chat encolhe, senão as pontas saem do lugar */
+/* in wide panels the chat tilt shrinks, otherwise the ends go out of place */
 @media (min-width: 560px) { .composer-box { transform: rotate(.7deg); } }
 @media (min-width: 900px) { .composer-box { transform: rotate(.4deg); } }
 
-/* enquanto a IA trabalha, os olhos ficam fechados */
+/* while the AI is working, the eyes stay closed */
 .eye .lids { transition: transform .4s ease-in-out; }
 body.busy .eye .lids { animation: none; transform: scaleY(0); }
 
-/* ---------- Escolha da IA por ícone ---------- */
+/* ---------- AI selection by icon ---------- */
 .controls { position: relative; }
 .picker { position: relative; }
 .ai-pill { padding: 0 4px 0 0; gap: 4px; }
@@ -645,7 +645,7 @@ body.busy .eye .lids { animation: none; transform: scaleY(0); }
 .ai-btn:disabled, .plus-btn:disabled { opacity: .4; cursor: default; }
 .ai-icon { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; }
 .ai-icon svg { width: 24px; height: 24px; }
-/* ao abrir, a própria cápsula da IA se estende para cima com os ícones */
+/* when opened, the AI pill itself extends upward with the icons */
 .provider-menu {
   position: absolute;
   left: 0;
@@ -656,7 +656,7 @@ body.busy .eye .lids { animation: none; transform: scaleY(0); }
   flex-direction: column-reverse;
   align-items: flex-start;
   gap: 4px;
-  padding: 10px 0 2px 0; /* mesma coluna do ícone da cápsula */
+  padding: 10px 0 2px 0; /* same column as the pill icon */
   border: 0;
   border-radius: 20px 20px 0 0;
   background: #000000;
@@ -667,7 +667,7 @@ body.busy .eye .lids { animation: none; transform: scaleY(0); }
   position: relative;
   display: grid;
   place-items: center;
-  width: 36px; /* mesmo tamanho do botão da cápsula, alinhado na mesma coluna */
+  width: 36px; /* same size as the pill button, aligned in the same column */
   height: 36px;
   padding: 0;
   border: 0;
@@ -694,7 +694,7 @@ body.busy .eye .lids { animation: none; transform: scaleY(0); }
 .provider-menu button .ai-icon { position: relative; width: 26px; height: 26px; }
 .provider-menu button .ai-icon svg { width: 22px; height: 22px; }
 
-/* menu do modelo (mini +): lista rolável, o atual marcado */
+/* model menu (mini +): scrollable list, the current one marked */
 .model-menu {
   position: absolute;
   left: 0;
@@ -729,13 +729,13 @@ body.busy .eye .lids { animation: none; transform: scaleY(0); }
 .model-menu button[aria-current="true"] { background: #ffffff; color: #000000; }
 .model-menu .menu-note { padding: 7px 10px; color: var(--muted); font-size: 12.5px; }
 
-/* olho que reaparece devagar no espaço livre da conversa */
+/* eye that slowly reappears in the chat's free space */
 .idle-eye { display: flex; justify-content: center; padding: 28px 0 12px; opacity: 0; transition: opacity 1.6s ease; }
 .idle-eye[hidden] { display: none; }
 .idle-eye.show { opacity: 1; }
 
-/* ao fechar (piscada ou IA trabalhando), o traço de baixo vira uma linha reta no meio,
-   como uma pálpebra fechada; os tempos são os mesmos da piscada */
+/* when closing (blink or AI working), the stroke below becomes a straight line in the middle,
+   like a closed eyelid; the timings are the same as the blink */
 @keyframes lash-blink {
   0%, 98.4%, 100% { d: path("M24 82 C40 91 60 91 76 82"); }
   98.9%, 99.5% { d: path("M8 50 C36 50 64 50 92 50"); }
