@@ -58,10 +58,6 @@ Write the request as you would to a person: "Summarize this page", "Find the con
 
 No dependencies, no build step: just load the folder in Chrome.
 
-## Support the creator
-
-If EYOA is useful to you, consider buying me a coffee: **[buymeacoffee.com/fyntav](https://buymeacoffee.com/fyntav)**. You can also use the **Sponsor** button at the top of this page.
-
 ## Credits
 
 - AI logos: [Simple Icons](https://simpleicons.org) (CC0) and [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT). Trademarks belong to their owners; see [`icons/ai/LICENSES.md`](icons/ai/LICENSES.md).
